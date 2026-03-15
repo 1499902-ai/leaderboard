@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Скалодром Вверх — Таблица лидеров</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap');
+
+    :root {
+      --bg: #0a0a12;
+      --panel: #12121e;
+      --accent1: #00c2ff;
+      --accent2: #7c3aed;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+      --green: #22c55e;
+      --text: #f0f0f0;
+      --muted: #666;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(0,194,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(124,58,237,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon { font-size: 40px; filter: drop-shadow(0 0 10px rgba(0,194,255,0.5)); }
+    .logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px; letter-spacing: 3px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .month-badge {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      padding: 6px 20px; border-radius: 100px;
+      font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .live-info { text-align: right; font-size: 11px; color: var(--muted); }
+    .live-dot {
+      display: inline-block; width: 7px; height: 7px;
+      background: var(--green); border-radius: 50%; margin-right: 5px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+      70%  { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+
+    /* ── Location tabs ── */
+    .loc-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 40px 0;
+    }
+
+    .loc-tab {
+      padding: 8px 24px;
+      border-radius: 10px 10px 0 0;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-bottom: none;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .loc-tab:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+    .loc-tab.active {
+      background: var(--panel);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.12);
+      position: relative;
+    }
+    .loc-tab.active::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    }
+
+    /* ── Location panels ── */
+    .loc-panel { display: none; }
+    .loc-panel.active { display: block; }
+
+    /* ── Tracks grid ── */
+    .tracks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      padding: 16px 40px 0;
+      height: calc(100vh - 180px);
+      overflow: hidden;
+    }
+
+    .track-panel {
+      background: var(--panel);
+      border-radius: 0 16px 16px 16px;
+      border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .track-header {
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .track-1 .track-header { background: linear-gradient(90deg, rgba(0,194,255,0.12), transparent); border-bottom: 2px solid var(--accent1); }
+    .track-2 .track-header { background: linear-gradient(90deg, rgba(124,58,237,0.12), transparent); border-bottom: 2px solid var(--accent2); }
+
+    .track-number { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 1; }
+    .track-1 .track-number { color: var(--accent1); }
+    .track-2 .track-number { color: var(--accent2); }
+    .track-title { font-size: 17px; font-weight: 700; }
+    .track-count { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .leaderboard { flex: 1; overflow: hidden; padding: 8px 0; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 52px 1fr auto;
+      align-items: center;
+      padding: 8px 22px;
+      border-radius: 8px;
+      margin: 0 10px 3px;
+      transition: background 0.2s;
+    }
+    .row.top1 { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.18); }
+    .row.top2 { background: rgba(192,192,192,0.06); border: 1px solid rgba(192,192,192,0.12); }
+    .row.top3 { background: rgba(205,127,50,0.06); border: 1px solid rgba(205,127,50,0.1); }
+
+    .rank { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--muted); }
+    .medal { font-size: 22px; }
+    .row.top1 .rank { color: var(--gold); font-size: 30px; }
+    .row.top2 .rank { color: var(--silver); font-size: 28px; }
+    .row.top3 .rank { color: var(--bronze); }
+
+    .name { font-size: 15px; font-weight: 600; }
+    .row.top1 .name { font-size: 17px; color: var(--gold); }
+    .row.top2 .name { font-size: 16px; color: var(--silver); }
+    .row.top3 .name { color: var(--bronze); }
+
+    .date { font-size: 11px; margin-top: 2px; }
+    .row.top1 .date { color: rgba(255,215,0,0.55); }
+    .row.top2 .date { color: rgba(192,192,192,0.55); }
+    .row.top3 .date { color: rgba(205,127,50,0.55); }
+    .row:not(.top1):not(.top2):not(.top3) .date { color: var(--muted); }
+
+    .time-badge {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+      padding: 3px 12px; border-radius: 6px; letter-spacing: 1px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07);
+    }
+    .row.top1 .time-badge { background: rgba(255,215,0,0.12); border-color: rgba(255,215,0,0.25); color: var(--gold); font-size: 26px; }
+    .row.top2 .time-badge { background: rgba(192,192,192,0.08); border-color: rgba(192,192,192,0.2); color: var(--silver); }
+    .row.top3 .time-badge { background: rgba(205,127,50,0.08); border-color: rgba(205,127,50,0.18); color: var(--bronze); }
+
+    .empty-state {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 100%; color: var(--muted); gap: 10px;
+    }
+    .empty-icon { font-size: 48px; opacity: 0.25; }
+
+    /* ── Ticker ── */
+    .ticker-wrap {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,18,0.92);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 8px 0; overflow: hidden;
+    }
+    .ticker { display: flex; gap: 50px; animation: ticker 35s linear infinite; white-space: nowrap; }
+    @keyframes ticker { from { transform: translateX(100vw); } to { transform: translateX(-200%); } }
+    .ticker-item { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .ticker-item strong { color: var(--text); }
+
+    .error-banner {
+      position: fixed; top: 16px; left: 5%; right: 5%;
+      background: rgba(180,20,20,0.97); padding: 14px 24px;
+      border-radius: 12px; font-size: 15px; font-weight: 600;
+      text-align: center; display: none; z-index: 999; color: #fff;
+    }
+
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    .new-entry { animation: slideIn 0.4s ease forwards; }
+  </style>
+</head>
+<body>
+
+<div class="error-banner" id="errorBanner">⚠️ Ошибка загрузки данных</div>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🧗</div>
+    <div>
+      <div class="logo-text">Покори высоту</div>
+      <div class="logo-sub">Таблица лидеров • Скоростное восхождение</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="month-badge" id="monthBadge">Загрузка...</div>
+    <div class="live-info">
+      <div><span class="live-dot"></span>Обновляется в реальном времени</div>
+      <div id="lastUpdate" style="margin-top:3px">—</div>
+    </div>
+  </div>
+</header>
+
+<!-- Location tabs -->
+<div class="loc-tabs" id="locTabs"></div>
+
+<!-- Location panels -->
+<div id="locPanels"></div>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span class="ticker-item">🧗 Загружаем результаты...</span>
+  </div>
+</div>
+
+<script>
+  // ═══ КОНФИГУРАЦИЯ ══════════════════════════════════════════════════════════
+  const SPREADSHEET_ID   = "1p0xuq0ezPj2FFDcLaaQVlSkROdMIjipY48gePkJbPFc";
+  const REFRESH_INTERVAL = 30000;
+  const TOP_LIMIT        = 10;
+
+  // Локации и их трассы — должны совпадать с bot.py
+  const LOCATIONS = {
+    "🏔 Красная Площадь": ["Трасса 1", "Трасса 2"],
+    "🌌 Галактика":       ["Трасса 1", "Трасса 2"],
+    "🏰 Сказка":          ["Трасса 1", "Трасса 2"],
+  };
+
+  const LOC_COLORS = {
+    "🏔 Красная Площадь": { t1: "#00c2ff", t2: "#7c3aed" },
+    "🌌 Галактика":       { t1: "#f59e0b", t2: "#10b981" },
+    "🏰 Сказка":          { t1: "#f43f5e", t2: "#8b5cf6" },
+  };
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const MONTHS = {
+    "January":"Январь","February":"Февраль","March":"Март","April":"Апрель",
+    "May":"Май","June":"Июнь","July":"Июль","August":"Август",
+    "September":"Сентябрь","October":"Октябрь","November":"Ноябрь","December":"Декабрь"
+  };
+
+  function getMonthName() {
+    const now = new Date();
+    return `${now.toLocaleString('en-US',{month:'long'})} ${now.getFullYear()}`;
+  }
+  function getRuMonth() {
+    const now = new Date();
+    const eng = now.toLocaleString('en-US',{month:'long'});
+    return `${MONTHS[eng]||eng} ${now.getFullYear()}`;
+  }
+
+  let activeLocation = Object.keys(LOCATIONS)[0];
+
+  // Build tabs and panels
+  function buildUI() {
+    const tabsEl   = document.getElementById("locTabs");
+    const panelsEl = document.getElementById("locPanels");
+
+    Object.keys(LOCATIONS).forEach((loc, idx) => {
+      // Tab
+      const tab = document.createElement("div");
+      tab.className = "loc-tab" + (idx === 0 ? " active" : "");
+      tab.textContent = loc;
+      tab.dataset.loc = loc;
+      tab.onclick = () => switchLocation(loc);
+      tabsEl.appendChild(tab);
+
+      // Panel
+      const panel = document.createElement("div");
+      panel.className = "loc-panel" + (idx === 0 ? " active" : "");
+      panel.id = `panel-${idx}`;
+      panel.dataset.loc = loc;
+
+      const grid = document.createElement("div");
+      grid.className = "tracks-grid";
+
+      LOCATIONS[loc].forEach((track, ti) => {
+        const tClass = ti === 0 ? "track-1" : "track-2";
+        const colors = LOC_COLORS[loc] || {};
+        const color  = ti === 0 ? colors.t1 : colors.t2;
+
+        grid.innerHTML += `
+          <div class="track-panel ${tClass}" id="tp-${idx}-${ti}" style="--tc:${color}">
+            <div class="track-header" style="border-bottom-color:${color}">
+              <div class="track-number" style="color:${color}">${ti+1}</div>
+              <div>
+                <div class="track-title">${track}</div>
+                <div class="track-count" id="cnt-${idx}-${ti}">Загрузка...</div>
+              </div>
+            </div>
+            <div class="leaderboard" id="board-${idx}-${ti}">
+              <div class="empty-state"><div class="empty-icon">⏳</div></div>
+            </div>
+          </div>`;
+      });
+
+      panel.appendChild(grid);
+      panelsEl.appendChild(panel);
+    });
+  }
+
+  function switchLocation(loc) {
+    activeLocation = loc;
+    document.querySelectorAll(".loc-tab").forEach(t => t.classList.toggle("active", t.dataset.loc === loc));
+    document.querySelectorAll(".loc-panel").forEach(p => p.classList.toggle("active", p.dataset.loc === loc));
+  }
+
+  async function fetchSheet() {
+    const monthName = encodeURIComponent(getMonthName());
+    const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${monthName}`;
+    const res  = await fetch(url);
+    const text = await res.text();
+    const start = text.indexOf('{'), end = text.lastIndexOf('}') + 1;
+    return JSON.parse(text.substring(start, end));
+  }
+
+  function parseRows(json) {
+    const cols = json.table.cols.map(c => c.label || c.id);
+    const rows = (json.table.rows || []).map(r => {
+      const obj = {};
+      r.c.forEach((cell, i) => { obj[cols[i]] = cell?.f ?? cell?.v ?? ""; });
+      return obj;
+    });
+    return rows.filter(r => r["ФИО"] && String(r["ФИО"]).trim() !== "" && r["ФИО"] !== "ФИО");
+  }
+
+  function getTimeSec(r)  { const v = r["Время (сек)"]; return (v !== "" && v !== undefined) ? parseFloat(v) : Infinity; }
+  function formatTime(r)  { return r["Время (формат)"] || (r["Время (сек)"] ? r["Время (сек)"] + " сек" : "—"); }
+  function formatDate(r)  { const d = r["Дата"]; return d ? String(d).split(" ")[0] : "—"; }
+
+  function renderBoard(boardId, countId, rows, location, track) {
+    const board   = document.getElementById(boardId);
+    const countEl = document.getElementById(countId);
+    if (!board) return;
+
+    const filtered = rows.filter(r =>
+      String(r["Локация"]).trim() === String(location).trim() &&
+      String(r["Трасса"]).trim()  === String(track).trim()
+    );
+    const sorted = [...filtered].sort((a,b) => getTimeSec(a) - getTimeSec(b));
+    const top    = sorted.slice(0, TOP_LIMIT);
+
+    const n = filtered.length;
+    countEl.textContent = `${n} участник${n===1?'':n<5?'а':'ов'}`;
+
+    if (top.length === 0) {
+      board.innerHTML = `<div class="empty-state"><div class="empty-icon">🧗</div><div>Пока нет результатов — будь первым!</div></div>`;
+      return;
+    }
+
+    const medals  = ["🥇","🥈","🥉"];
+    const classes = ["top1","top2","top3"];
+
+    board.innerHTML = top.map((r, i) => {
+      const cls  = classes[i] || "";
+      const rank = medals[i] ? `<span class="medal">${medals[i]}</span>` : `<span class="rank">${i+1}</span>`;
+      return `
+        <div class="row ${cls} new-entry" style="animation-delay:${i*35}ms">
+          ${rank}
+          <div>
+            <div class="name">${r["ФИО"]}</div>
+            <div class="date">📅 ${formatDate(r)}</div>
+          </div>
+          <div class="time-badge">${formatTime(r)}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function updateTicker(rows) {
+    const recent = [...rows].reverse().slice(0, 20);
+    if (!recent.length) return;
+    const items = recent.map(r =>
+      `<span class="ticker-item">🧗 <strong>${r["ФИО"]}</strong> • ${r["Локация"]} • ${r["Трасса"]} • ⏱ ${formatTime(r)}</span>`
+    ).join("");
+    document.getElementById("ticker").innerHTML = items + items;
+  }
+
+  async function refresh() {
+    try {
+      document.getElementById("errorBanner").style.display = "none";
+      const json = await fetchSheet();
+      const rows = parseRows(json);
+
+      Object.keys(LOCATIONS).forEach((loc, idx) => {
+        LOCATIONS[loc].forEach((track, ti) => {
+          renderBoard(`board-${idx}-${ti}`, `cnt-${idx}-${ti}`, rows, loc, track);
+        });
+      });
+
+      updateTicker(rows);
+      document.getElementById("monthBadge").textContent = getRuMonth();
+      document.getElementById("lastUpdate").textContent = "Обновлено: " + new Date().toLocaleTimeString("ru-RU");
+    } catch(e) {
+      console.error(e);
+      const banner = document.getElementById("errorBanner");
+      banner.style.display = "block";
+      banner.textContent = "⚠️ Ошибка загрузки: " + e.message;
+    }
+  }
+
+  buildUI();
+  refresh();
+  setInterval(refresh, REFRESH_INTERVAL);
+</script>
+</body>
+</html>
