@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=1920, initial-scale=1.0"/>
+  <title>Скалодром Вверх — Покори высоту</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap');
+    :root {
+      --bg:#07070f;--panel:#0e0e1c;--border:rgba(255,255,255,0.07);
+      --accent1:#00c2ff;--accent2:#7c3aed;--gold:#ffd700;--silver:#c0c0c0;
+      --bronze:#cd7f32;--green:#22c55e;--text:#f0f0f0;--muted:#555;--prize:#ff9f0a;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
+    body::before{content:'';position:fixed;inset:0;background:
+      radial-gradient(ellipse at 15% 50%,rgba(0,194,255,0.07) 0%,transparent 55%),
+      radial-gradient(ellipse at 85% 50%,rgba(124,58,237,0.07) 0%,transparent 55%),
+      radial-gradient(ellipse at 50% 0%,rgba(255,159,10,0.04) 0%,transparent 40%);
+      pointer-events:none;z-index:0;}
+
+    /* ── ШАПКА ── */
+    .header{position:relative;z-index:10;display:grid;grid-template-columns:1fr auto 1fr;
+      align-items:center;padding:0 56px;height:140px;border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg,rgba(0,194,255,0.04) 0%,transparent 100%);}
+    .logo{display:flex;align-items:center;gap:20px;}
+    .logo-icon{font-size:72px;filter:drop-shadow(0 0 20px rgba(0,194,255,0.7));
+      animation:float 4s ease-in-out infinite;}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+    .logo-main{font-family:'Bebas Neue',sans-serif;font-size:60px;line-height:1;letter-spacing:4px;
+      background:linear-gradient(90deg,#fff 0%,var(--accent1) 60%,var(--accent2) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .logo-sub{font-size:15px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+    .hero-title{text-align:center;}
+    .hero-main{font-family:'Bebas Neue',sans-serif;font-size:96px;letter-spacing:10px;line-height:1;
+      background:linear-gradient(90deg,var(--accent1),#fff,var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 30px rgba(0,194,255,0.4));}
+    .hero-sub{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:12px;
+      color:var(--prize);text-transform:uppercase;margin-top:4px;
+      filter:drop-shadow(0 0 12px rgba(255,159,10,0.5));}
+
+    .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+    .month-badge{background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      padding:10px 32px;border-radius:100px;font-family:'Bebas Neue',sans-serif;
+      font-size:26px;letter-spacing:3px;}
+    .live-row{display:flex;align-items:center;gap:8px;font-size:16px;color:var(--muted);}
+    .live-dot{width:10px;height:10px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,0.5);}70%{box-shadow:0 0 0 9px rgba(34,197,94,0);}100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}}
+
+    /* ── БАННЕР ПРИЗА ── */
+    .prize-banner{position:relative;z-index:10;display:flex;align-items:center;
+      justify-content:center;gap:16px;padding:13px 56px;
+      background:linear-gradient(90deg,transparent 0%,rgba(255,159,10,0.12) 20%,rgba(255,159,10,0.22) 50%,rgba(255,159,10,0.12) 80%,transparent 100%);
+      border-bottom:1px solid rgba(255,159,10,0.22);}
+    .prize-icon{font-size:32px;}
+    .prize-text{font-size:22px;font-weight:700;color:var(--prize);letter-spacing:1px;text-transform:uppercase;}
+    .prize-text span{color:#fff;font-weight:900;}
+
+    /* ── ВКЛАДКИ ── */
+    .loc-tabs{position:relative;z-index:10;display:flex;gap:8px;padding:14px 56px 0;}
+    .loc-tab{padding:12px 44px;border-radius:14px 14px 0 0;font-size:22px;font-weight:700;
+      cursor:pointer;border:1px solid var(--border);border-bottom:none;
+      background:rgba(255,255,255,0.03);color:var(--muted);transition:all 0.2s;letter-spacing:0.5px;}
+    .loc-tab:hover{background:rgba(255,255,255,0.07);color:var(--text);}
+    .loc-tab.active{background:var(--panel);color:var(--text);border-color:rgba(255,255,255,0.12);position:relative;}
+    .loc-tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));}
+
+    .loc-panel{display:none;}
+    .loc-panel.active{display:block;}
+
+    /* ── СЕТКА ТРАСС ── */
+    .tracks-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;
+      padding:16px 56px 0;height:calc(1080px - 140px - 54px - 62px - 40px);}
+
+    .track-panel{background:var(--panel);border-radius:0 20px 20px 20px;
+      border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;}
+    .track-header{padding:20px 32px;display:flex;align-items:center;gap:18px;}
+    .track-number{font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:1;}
+    .track-title{font-size:42px;font-weight:800;text-align:center;}
+    .track-count{font-size:18px;color:var(--muted);margin-top:4px;}
+    .leaderboard{flex:1;overflow:hidden;padding:10px 0;}
+
+    /* ── СТРОКИ ── */
+    .row{display:grid;grid-template-columns:80px 1fr auto;align-items:center;
+      padding:13px 30px;border-radius:14px;margin:0 14px 7px;}
+    .row.top1{background:linear-gradient(90deg,rgba(255,215,0,0.14),rgba(255,215,0,0.05));border:1px solid rgba(255,215,0,0.3);}
+    .row.top2{background:rgba(192,192,192,0.07);border:1px solid rgba(192,192,192,0.16);}
+    .row.top3{background:rgba(205,127,50,0.07);border:1px solid rgba(205,127,50,0.14);}
+    .row:not(.top1):not(.top2):not(.top3){background:rgba(255,255,255,0.02);}
+
+    .medal{font-size:38px;}
+    .rank{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--muted);}
+    .name{font-size:26px;font-weight:700;}
+    .row.top1 .name{font-size:30px;color:var(--gold);}
+    .row.top2 .name{font-size:28px;color:var(--silver);}
+    .row.top3 .name{font-size:27px;color:var(--bronze);}
+    .date{font-size:15px;margin-top:4px;}
+    .row.top1 .date{color:rgba(255,215,0,0.5);}
+    .row.top2 .date{color:rgba(192,192,192,0.5);}
+    .row.top3 .date{color:rgba(205,127,50,0.5);}
+    .row:not(.top1):not(.top2):not(.top3) .date{color:var(--muted);}
+
+    .prize-crown{font-size:24px;margin-left:10px;animation:glow 2s ease-in-out infinite;}
+    @keyframes glow{0%,100%{filter:drop-shadow(0 0 4px var(--prize));}50%{filter:drop-shadow(0 0 18px var(--prize));}}
+
+    .time-badge{font-family:'Bebas Neue',sans-serif;font-size:34px;
+      padding:6px 22px;border-radius:10px;letter-spacing:2px;
+      background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);}
+    .row.top1 .time-badge{font-size:42px;background:rgba(255,215,0,0.15);border-color:rgba(255,215,0,0.3);color:var(--gold);}
+    .row.top2 .time-badge{background:rgba(192,192,192,0.1);border-color:rgba(192,192,192,0.22);color:var(--silver);}
+    .row.top3 .time-badge{background:rgba(205,127,50,0.1);border-color:rgba(205,127,50,0.2);color:var(--bronze);}
+
+    /* Подпись «среднее» под временем */
+    .time-wrap{text-align:center;}
+    .time-avg{font-size:13px;color:var(--muted);margin-top:2px;letter-spacing:0.5px;}
+
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      height:100%;color:var(--muted);gap:14px;}
+    .empty-icon{font-size:64px;opacity:0.2;}
+    .empty-text{font-size:22px;}
+
+    /* ── БЕГУЩАЯ СТРОКА ── */
+    .ticker-wrap{position:fixed;bottom:0;left:0;right:0;height:40px;
+      background:rgba(7,7,15,0.97);border-top:1px solid rgba(255,255,255,0.05);
+      overflow:hidden;display:flex;align-items:center;z-index:100;}
+    .ticker{display:flex;gap:80px;animation:ticker 45s linear infinite;white-space:nowrap;}
+    @keyframes ticker{from{transform:translateX(1920px);}to{transform:translateX(-300%);}}
+    .ticker-item{font-size:16px;color:var(--muted);display:flex;align-items:center;gap:10px;}
+    .ticker-item strong{color:var(--text);}
+
+    .error-banner{position:fixed;top:20px;left:5%;right:5%;background:rgba(180,20,20,0.97);
+      padding:18px 28px;border-radius:14px;font-size:18px;font-weight:700;
+      text-align:center;display:none;z-index:999;color:#fff;}
+
+    @keyframes slideIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+    .new-entry{animation:slideIn 0.5s ease forwards;}
+  </style>
+</head>
+<body>
+
+<div class="error-banner" id="errorBanner"></div>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🧗</div>
+    <div>
+      <div class="logo-main">Скалодром Вверх</div>
+      <div class="logo-sub">Таблица лидеров</div>
+    </div>
+  </div>
+  <div class="hero-title">
+    <div class="hero-main">ПОКОРИ ВЫСОТУ</div>
+    <div class="hero-sub">⚡ Скоростное восхождение ⚡</div>
+  </div>
+  <div class="header-right">
+    <div class="month-badge" id="monthBadge">Загрузка...</div>
+    <div class="live-row"><div class="live-dot"></div><span>Обновляется в реальном времени</span></div>
+    <div style="font-size:14px;color:var(--muted)" id="lastUpdate">—</div>
+  </div>
+</header>
+
+<div class="prize-banner">
+  <div class="prize-icon">🏆</div>
+  <div class="prize-text">
+    <span>ТОП-1 на каждой локации</span> получает приз в конце месяца — рейтинг считается по среднему времени за обе трассы! 🎁
+  </div>
+  <div class="prize-icon">🏆</div>
+</div>
+
+<div class="loc-tabs" id="locTabs"></div>
+<div id="locPanels"></div>
+
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span class="ticker-item">🧗 Загружаем результаты...</span>
+  </div>
+</div>
+
+<script>
+  const SPREADSHEET_ID   = "1p0xuq0ezPj2FFDcLaaQVlSkROdMIjipY48gePkJbPFc";
+  const REFRESH_INTERVAL = 30000;
+  const TOP_LIMIT        = 7;
+
+  const LOCATIONS = {
+    "🏔 Красная Площадь": ["Трасса 1", "Трасса 2"],
+    "🌌 Галактика":       ["Трасса 1", "Трасса 2"],
+    "🏰 Сказка":          ["Трасса 1", "Трасса 2"],
+  };
+  const LOC_COLORS = {
+    "🏔 Красная Площадь": { t1:"#00c2ff", t2:"#7c3aed" },
+    "🌌 Галактика":       { t1:"#f59e0b", t2:"#10b981" },
+    "🏰 Сказка":          { t1:"#f43f5e", t2:"#8b5cf6" },
+  };
+  const MONTHS = {"January":"Январь","February":"Февраль","March":"Март","April":"Апрель","May":"Май","June":"Июнь","July":"Июль","August":"Август","September":"Сентябрь","October":"Октябрь","November":"Ноябрь","December":"Декабрь"};
+
+  const getMonthName = () => { const n=new Date(); return `${n.toLocaleString('en-US',{month:'long'})} ${n.getFullYear()}`; };
+  const getRuMonth   = () => { const n=new Date(),e=n.toLocaleString('en-US',{month:'long'}); return `${MONTHS[e]||e} ${n.getFullYear()}`.toUpperCase(); };
+  const getRuMonthSheet = () => { const n=new Date(),e=n.toLocaleString('en-US',{month:'long'}); return `${MONTHS[e]||e} ${n.getFullYear()}`; };
+
+  function buildUI() {
+    const tabsEl=document.getElementById("locTabs"), panelsEl=document.getElementById("locPanels");
+    Object.keys(LOCATIONS).forEach((loc,idx) => {
+      const tab=document.createElement("div");
+      tab.className="loc-tab"+(idx===0?" active":"");
+      tab.textContent=loc; tab.dataset.loc=loc;
+      tab.onclick=()=>switchLocation(loc);
+      tabsEl.appendChild(tab);
+
+      const panel=document.createElement("div");
+      panel.className="loc-panel"+(idx===0?" active":"");
+      panel.dataset.loc=loc;
+      const grid=document.createElement("div");
+      grid.className="tracks-grid";
+
+      LOCATIONS[loc].forEach((track,ti) => {
+        const color=(LOC_COLORS[loc]||{})[ti===0?"t1":"t2"]||"#00c2ff";
+        const tp=document.createElement("div");
+        tp.className="track-panel "+(ti===0?"track-1":"track-2");
+        tp.innerHTML=`
+          <div class="track-header" style="background:linear-gradient(90deg,${color}18,transparent);border-bottom:2px solid ${color}">
+            <div class="track-number" style="color:${color}">${ti+1}</div>
+            <div>
+              <div class="track-title">${track}</div>
+              <div class="track-count" id="cnt-${idx}-${ti}">Загрузка...</div>
+            </div>
+          </div>
+          <div class="leaderboard" id="board-${idx}-${ti}">
+            <div class="empty-state"><div class="empty-icon">⏳</div></div>
+          </div>`;
+        grid.appendChild(tp);
+      });
+
+      // Панель общего рейтинга по локации (по среднему)
+      const avgPanel=document.createElement("div");
+      avgPanel.id=`avg-${idx}`;
+      avgPanel.style.display="none";
+      panel.appendChild(grid);
+      panel.appendChild(avgPanel);
+      panelsEl.appendChild(panel);
+    });
+  }
+
+  function switchLocation(loc) {
+    document.querySelectorAll(".loc-tab").forEach(t=>t.classList.toggle("active",t.dataset.loc===loc));
+    document.querySelectorAll(".loc-panel").forEach(p=>p.classList.toggle("active",p.dataset.loc===loc));
+  }
+
+  async function fetchSheet() {
+    // Пробуем оба варианта названия листа: английский и русский
+    const names = [getMonthName(), getRuMonthSheet()];
+    for (const name of names) {
+      const url=`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(name)}`;
+      const res = await fetch(url);
+      const text = await res.text();
+      if (text.indexOf('"table"') === -1) continue;
+      const json = JSON.parse(text.substring(text.indexOf('{'),text.lastIndexOf('}')+1));
+      if (json.table && json.table.cols && json.table.cols.length > 1) return json;
+    }
+    throw new Error("Лист не найден");
+  }
+
+  function parseRows(json) {
+    const cols=json.table.cols.map(c=>c.label||c.id);
+    const rawRows=(json.table.rows||[]).map(r=>{const o={};r.c.forEach((c,i)=>{o[cols[i]]=c?.f??c?.v??""});return o;});
+
+    return rawRows.map(r => {
+      // Нормализуем колонки — поддерживаем формат Google Form и формат бота
+      const name     = r["ФИО"] || r["ФИО клиента"] || r["ФИО участника"] || "";
+      const location = r["Локация"] || "";
+      const track    = r["Трасса"] || "";
+      const timeFmt  = r["Время (формат)"] || r["Время забега"] || r["Время"] || "";
+      const timeSec  = r["Время (сек)"] || parseTimeToSec(timeFmt);
+      const date     = r["Дата"] || r["Отметка времени"] || "";
+      const instr    = r["Инструктор"] || r["Фамилия инструктора"] || "";
+
+      return { "ФИО": String(name).trim(), "Локация": String(location).trim(),
+               "Трасса": String(track).trim(), "Время (сек)": timeSec,
+               "Время (формат)": String(timeFmt).trim(), "Дата": String(date).trim(),
+               "Инструктор": String(instr).trim() };
+    }).filter(r => r["ФИО"] && r["ФИО"] !== "" && r["ФИО"] !== "ФИО" && r["ФИО"] !== "ФИО клиента");
+  }
+
+  function parseTimeToSec(str) {
+    if (!str) return Infinity;
+    str = String(str).trim().replace(",", ".");
+    if (str.includes(":")) {
+      const p = str.split(":");
+      return Math.round((parseInt(p[0]) * 60 + parseFloat(p[1])) * 100) / 100;
+    }
+    const n = parseFloat(str);
+    return isNaN(n) ? Infinity : Math.round(n * 100) / 100;
+  }
+
+  const getTimeSec=r=>{const v=String(r["Время (сек)"]||"");if(v.includes(":"))return parseTimeToSec(v);const n=parseFloat(v.replace(",","."));if(!isNaN(n)&&n>0)return n;return parseTimeToSec(r["Время (формат)"]);};
+  function parseTimeToSec(s){if(!s)return Infinity;s=String(s).trim().replace(",",".");if(s.includes(":")){const p=s.split(":");return Math.round((parseInt(p[0])*60+parseFloat(p[1]))*100)/100;}const n=parseFloat(s);return isNaN(n)?Infinity:Math.round(n*100)/100;}
+  const formatTime=r=>{const f=r["Время (формат)"],s=r["Время (сек)"]; if(f&&f!=="")return f; if(s&&s!=="")return String(s); return "—";};
+  const formatDate=r=>{const d=r["Дата"];return d?String(d).split(" ")[0]:"—";};
+  const fmtSec=sec=>{if(sec===null)return"—";const m=Math.floor(sec/60),s=(sec%60).toFixed(1);return m>0?`${m}:${s.padStart(4,"0")}`:s+" сек";};
+
+  function renderBoard(boardId,countId,rows,location,track) {
+    const board=document.getElementById(boardId),countEl=document.getElementById(countId);
+    if(!board)return;
+    const locMatch=loc=>String(loc).replace(/[^\u0400-\u04FF\u0020-\u007E]/g,"").trim();const filtered=rows.filter(r=>locMatch(r["Локация"])===locMatch(location)&&String(r["Трасса"]).trim()===String(track).trim());
+
+    // Берём лучший результат каждого участника на этой трассе
+    const best={};
+    filtered.forEach(r=>{
+      const t=getTimeSec(r); if(t===null)return;
+      const name=r["ФИО"];
+      if(!best[name]||t<best[name].t) best[name]={t,r};
+    });
+    const top=Object.values(best).sort((a,b)=>a.t-b.t).slice(0,TOP_LIMIT);
+
+    const n=Object.keys(best).length;
+    countEl.textContent=`${n} участник${n===1?'':n<5?'а':'ов'}`;
+
+    if(!top.length){board.innerHTML=`<div class="empty-state"><div class="empty-icon">🧗</div><div class="empty-text">Пока нет результатов — будь первым!</div></div>`;return;}
+
+    const medals=["🥇","🥈","🥉"],classes=["top1","top2","top3"];
+    board.innerHTML=top.map(({t,r},i)=>{
+      const cls=classes[i]||"";
+      const rank=medals[i]?`<span class="medal">${medals[i]}</span>`:`<span class="rank">${i+1}</span>`;
+      return `<div class="row ${cls} new-entry" style="animation-delay:${i*40}ms">
+        ${rank}
+        <div><div class="name">${r["ФИО"]}</div><div class="date">📅 ${formatDate(r)}</div></div>
+        <div class="time-wrap"><div class="time-badge">${formatTime(r)}</div></div>
+      </div>`;
+    }).join("");
+  }
+
+  // Считаем средний рейтинг по локации (среднее лучших результатов по двум трассам)
+  function getLocationRanking(rows, location) {
+    const tracks = LOCATIONS[location] || [];
+    const playerBest = {}; // name -> {track -> bestTime}
+
+    rows.filter(r=>String(r["Локация"]).trim()===String(location).trim()).forEach(r=>{
+      const name=r["ФИО"]; const t=getTimeSec(r); const track=String(r["Трасса"]).trim();
+      if(t===null)return;
+      if(!playerBest[name]) playerBest[name]={};
+      if(!playerBest[name][track]||t<playerBest[name][track]) playerBest[name][track]=t;
+    });
+
+    // Только те кто пробежал обе трассы
+    return Object.entries(playerBest)
+      .filter(([,byTrack])=>tracks.every(tr=>byTrack[tr]!==undefined))
+      .map(([name,byTrack])=>{
+        const times=tracks.map(tr=>byTrack[tr]);
+        const avg=times.reduce((a,b)=>a+b,0)/times.length;
+        return {name,avg,times};
+      })
+      .sort((a,b)=>a.avg-b.avg);
+  }
+
+  function updateTicker(rows) {
+    const recent=[...rows].reverse().slice(0,20);
+    if(!recent.length)return;
+    const sep=`<span style="color:#2a2a3a;margin:0 20px">|</span>`;
+    const items=recent.map(r=>`<span class="ticker-item">🧗 <strong>${r["ФИО"]}</strong> &nbsp;•&nbsp; ${r["Локация"]} &nbsp;•&nbsp; ${r["Трасса"]} &nbsp;•&nbsp; ⏱ ${formatTime(r)}</span>`).join(sep);
+    document.getElementById("ticker").innerHTML=items+sep+items;
+  }
+
+  async function refresh() {
+    try {
+      document.getElementById("errorBanner").style.display="none";
+      const rows=parseRows(await fetchSheet());
+      Object.keys(LOCATIONS).forEach((loc,idx)=>{
+        LOCATIONS[loc].forEach((track,ti)=>renderBoard(`board-${idx}-${ti}`,`cnt-${idx}-${ti}`,rows,loc,track));
+      });
+      updateTicker(rows);
+      document.getElementById("monthBadge").textContent=getRuMonth();
+      document.getElementById("lastUpdate").textContent="Обновлено: "+new Date().toLocaleTimeString("ru-RU");
+    } catch(e) {
+      console.error(e);
+      const b=document.getElementById("errorBanner");
+      b.style.display="block"; b.textContent="⚠️ Ошибка загрузки: "+e.message;
+    }
+  }
+
+  // БЕЗ авто-переключения — только вручную
+  buildUI();
+  refresh();
+  setInterval(refresh, REFRESH_INTERVAL);
+</script>
+</body>
+</html>
