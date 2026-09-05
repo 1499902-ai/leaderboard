@@ -226,7 +226,7 @@
     <div class="month-badge" id="monthBadge">...</div>
   </div>
   <div class="hero-title">УСТАНОВИ СВОЙ РЕКОРД</div>
-  <div class="hero-sub" style="color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:2px">ИЮНЬ — АВГУСТ 2026</div>
+  <div class="hero-sub" style="color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:2px">СЕНТЯБРЬ — НОЯБРЬ 2026</div>
   <div class="live-row"><div class="live-dot"></div><span id="lastUpdate">Загрузка...</span></div>
 </div>
 
@@ -248,7 +248,7 @@
     <div class="reg-section">
       <div class="reg-stitle">📌 Правила</div>
       <div class="rules-grid">
-        <div class="rule-card"><div class="rule-title">Период</div><div class="rule-val">Сезон Июнь — Август 2026</div></div>
+        <div class="rule-card"><div class="rule-title">Период</div><div class="rule-val">Сезон Сентябрь — Ноябрь 2026</div></div>
         <div class="rule-card"><div class="rule-title">Попытки</div><div class="rule-val">Не ограничено!</div></div>
         <div class="rule-card"><div class="rule-title">Засчитывается</div><div class="rule-val">Лучшая попытка</div></div>
         <div class="rule-card"><div class="rule-title">Итоговый рейтинг</div><div class="rule-val">Среднее по двум трассам</div></div>
@@ -276,7 +276,7 @@
         <div class="reg-section">
       <div class="reg-stitle">🏅 Текущие претенденты на призы</div>
       <div id="leadersBlock"><div style="color:var(--muted);font-size:12px">Загрузка...</div></div>
-      <div class="leaders-note">Список обновляется автоматически. Итоги — в конце квартала.</div>
+      <div class="leaders-note">Список обновляется автоматически. Итоги — в конце сезона.</div>
     </div>
 
     <div class="reg-section">
@@ -408,9 +408,9 @@
     });
   }
 
-  // Квартал: июнь–август 2026
-  const QUARTER_START = new Date(2026, 5, 1);  // 1 июня 2026
-  const QUARTER_END   = new Date(2026, 8, 1);  // 1 сентября 2026 (не включая)
+  // Сезон: сентябрь–ноябрь 2026
+  const QUARTER_START = new Date(2026, 8, 1);  // 1 сентября 2026
+  const QUARTER_END   = new Date(2026, 11, 1); // 1 декабря 2026 (не включая)
 
   function isCurrentMonth(s){
     if(!s||s==="") return false;
@@ -575,7 +575,7 @@
       const rows=parseRows(await fetchSheet());
       renderAll(rows);
       renderLeaders(rows);
-      document.getElementById("monthBadge").textContent="ИЮН — АВГ 2026";
+      document.getElementById("monthBadge").textContent="СЕН — НОЯ 2026";
       document.getElementById("lastUpdate").textContent="Обновлено: "+new Date().toLocaleTimeString("ru-RU");
     }catch(e){
       const b=document.getElementById("errorBanner");
